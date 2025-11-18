@@ -1,1 +1,3 @@
 .env
+ah_data.db
+__pycache__/

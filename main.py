@@ -1,54 +1,22 @@
-import requests
-import os
-from dotenv import load_dotenv
+from datetime import datetime
+from fetch import get_auctions_for_realm
+from processor import compute_item_medians
+from storage import init_db, insert_median_price
 
-load_dotenv()
+def main():
+    init_db()
+    print("database initalised")
 
-CLIENT_ID = os.getenv('client_id')
-CLIENT_SECRET = os.getenv('client_secret')
+    data = get_auctions_for_realm()
+    print("got data")
 
-def get_access_token():
-    url = "https://eu.battle.net/oauth/token"
-    data = {"grant_type": "client_credentials"}
-    resp = requests.post(url, data=data, auth=(CLIENT_ID, CLIENT_SECRET))
-    resp.raise_for_status()
-    token = resp.json()["access_token"]
-    return token
+    medians = compute_item_medians(data)
+    print("medians calculated")
 
-def get_commodities():
-    token = get_access_token()
-    url = "https://eu.api.blizzard.com/data/wow/auctions/commodities"
-    params = {
-        "namespace": "dynamic-eu",
-        "locale": "en_US"
-    }
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-
-    resp = requests.get(url, params=params, headers=headers)
-    resp.raise_for_status()
-    return resp.json()
-
-def get_auctions_for_realm():
-    token = get_access_token()
-    
-    # Id for Silvermoon
-    connected_realm_id = 3391
-    
-    url = f"https://eu.api.blizzard.com/data/wow/connected-realm/{connected_realm_id}/auctions"
-    params = {
-        "namespace": "dynamic-eu",
-        "locale": "en_US"
-    }
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-
-    resp = requests.get(url, params=params, headers=headers)
-    resp.raise_for_status()
-    return resp.json()
+    timestamp = datetime.utcnow().isoformat()
+    for item_id, median_price in medians.items():
+        insert_median_price(item_id, timestamp, median_price)
+    print("data inserted")
 
 if __name__ == "__main__":
-    data = get_auctions_for_realm()
-    print(data)
+    main()
