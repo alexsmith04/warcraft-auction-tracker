@@ -48,3 +48,18 @@ def get_auctions_for_realm():
     resp = requests.get(url, params=params, headers=headers)
     resp.raise_for_status()
     return resp.json()
+
+def get_item_info_by_id(item_id):
+    token = get_access_token()
+
+    url = f"https://eu.api.blizzard.com/data/wow/item/{item_id}"
+    params = {
+        "namespace": "static-eu",
+        "locale": "en_US"
+    }
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    resp = requests.get(url, params=params, headers=headers)
+    resp.raise_for_status()
+    return resp.json()

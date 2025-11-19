@@ -1,6 +1,7 @@
 import json
 import statistics
 from collections import defaultdict
+from fetch import get_item_info_by_id
 
 def normalise_auction(auction):
 
@@ -48,3 +49,9 @@ def compute_item_medians(data):
     medians = calculate_median(price_map)
 
     return medians
+
+def get_item_name_from_id(item_id):
+    item_info = get_item_info_by_id(item_id)
+    if item_info is not None:
+        item_name = item_info["name"]
+        print(item_name)
