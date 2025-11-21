@@ -54,4 +54,15 @@ def get_item_name_from_id(item_id):
     item_info = get_item_info_by_id(item_id)
     if item_info is not None:
         item_name = item_info["name"]
-        print(item_name)
+    
+    return item_name
+
+def convert_price(price):
+
+    gold = price // 10000
+    silver = (price % 10000) // 100
+    copper = ((price % 10000) % 100) // 100
+
+    print(f"g {gold} s {silver} c {copper}")
+
+    return gold, silver, copper
