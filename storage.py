@@ -19,6 +19,29 @@ def init_db():
     conn.commit()
     conn.close()
 
+def get_item_name_from_db(item_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM items WHERE item_id = ?", (item_id,))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else None
+
+def upsert_item_name(item_id, name):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        """
+        INSERT INTO items (item_id, name, last_updated)
+        VALUES (?, ?, datetime('now'))
+        ON CONFLICT(item_id) DO UPDATE SET
+            name = excluded.name,
+            last_updated = excluded.last_updated
+        """,
+        (item_id, name))
+    conn.commit()
+    conn.close()
+
 def insert_median_price(item_id, timestamp, median_price):
 
     conn = get_connection()
