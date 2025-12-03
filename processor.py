@@ -17,6 +17,21 @@ def normalise_auction(auction):
 
         auction = {'id': item_id, 'quantity': quantity, 'buyout_price': buyout_price, 'unit_price': unit_price}
         return auction
+    
+def normalise_auction_commodities(auction):
+
+    buyout_price = auction.get('unit_price') * auction.get('quantity')
+    
+    if not buyout_price:
+        return None
+
+    else:
+        item_id = auction['item']['id']
+        quantity = auction['quantity']
+        unit_price = buyout_price/quantity
+
+        auction = {'id': item_id, 'quantity': quantity, 'buyout_price': buyout_price, 'unit_price': unit_price}
+        return auction
 
 def group_auctions_by_item_id(normalised_auctions):
     
@@ -50,12 +65,22 @@ def compute_item_medians(data):
 
     return medians
 
+def compute_commodities_medians(data):
+    
+    normalised_auctions = []
+    for auction in data['auctions']:
+        normalised_auctions.append(normalise_auction_commodities(auction))
+
+    price_map = group_auctions_by_item_id(normalised_auctions)
+    medians = calculate_median(price_map)
+
+    return medians
+
 def get_item_name_from_id(item_id):
     item_info = get_item_info_by_id(item_id)
-    if item_info is not None:
-        item_name = item_info["name"]
-    
-    return item_name
+    if item_info and "name" in item_info:
+        return item_info["name"]
+    return None
 
 def convert_price(price):
 

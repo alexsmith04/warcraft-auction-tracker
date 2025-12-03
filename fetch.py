@@ -60,6 +60,14 @@ def get_item_info_by_id(item_id):
     headers = {
         "Authorization": f"Bearer {token}"
     }
-    resp = requests.get(url, params=params, headers=headers)
-    resp.raise_for_status()
-    return resp.json()
+    
+    try:
+        resp = requests.get(url, params=params, headers=headers)
+        if resp.status_code == 404:
+            return None  # item does not exist in DB
+        resp.raise_for_status()
+        return resp.json()
+
+    except requests.HTTPError as e:
+        print(f"[WARN] Could not fetch item {item_id}: {e}")
+        return None
