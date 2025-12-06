@@ -88,6 +88,6 @@ def convert_price(price):
     silver = (price % 10000) // 100
     copper = ((price % 10000) % 100) // 100
 
-    print(f"g {gold} s {silver} c {copper}")
+    print(f"{gold}g {silver}s {copper}c")
 
     return gold, silver, copper

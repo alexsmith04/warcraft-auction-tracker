@@ -75,3 +75,21 @@ def get_prices_for_item(item_id):
     results = cursor.fetchall()
     conn.close()
     return results
+
+def get_item_id_from_name(name):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT item_id
+        FROM items
+        WHERE name = ?
+        COLLATE NOCASE
+        """,
+        (name,))
+    
+    results = cursor.fetchall()
+    conn.close()
+    return results
