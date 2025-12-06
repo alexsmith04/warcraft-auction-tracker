@@ -2,6 +2,7 @@ import json
 import statistics
 from collections import defaultdict
 from fetch import get_item_info_by_id
+from datetime import datetime
 
 def normalise_auction(auction):
 
@@ -91,3 +92,8 @@ def convert_price(price):
     print(f"{gold}g {silver}s {copper}c")
 
     return gold, silver, copper
+
+def convert_timestamp(timestamp):
+
+    dt = datetime.fromisoformat(timestamp)
+    return dt.strftime("%H:%m/%d")
