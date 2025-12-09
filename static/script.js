@@ -85,10 +85,14 @@ function get_timeframe(range) {
     return { start, end };
 }
 
-document.querySelectorAll(".timeframe-button").forEach(button => {
-    button.addEventListener("click", () => {
-        const range = button.dataset.range
-        const { start, end } = get_timeframe(range)
+var buttons = document.querySelectorAll(".timeframe-button")
+buttons.forEach(function(button) {
+    button.addEventListener("click", function() {
+        var range = button.dataset.range
+        var timeframe = get_timeframe(range)
+        var start = timeframe.start
+        var end = timeframe.end
+
         fetch_price_data("2770", start, end)
     })
 })
