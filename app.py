@@ -4,6 +4,7 @@ from storage import get_prices_for_item
 from processor import convert_timestamp_unix
 from typing import Optional
 from datetime import datetime, timezone
+from storage import get_item_name_from_db
 
 app = FastAPI()
 
@@ -29,14 +30,11 @@ app.add_middleware(
 async def root():
     return {"message": "Hello World"}
 
-@app.get("/demo")
-async def demo_data():
-    # A list of simple mock data points
-    return [
-        {"t": 1, "price": 10},
-        {"t": 2, "price": 12},
-        {"t": 3, "price": 11}
-    ]
+@app.get("/name/{item_id}")
+async def get_item_name(item_id: int):
+    name = get_item_name_from_db(item_id)
+
+    return {"name": name}
 
 @app.get("/data")
 async def ah_prices(
