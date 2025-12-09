@@ -1,13 +1,16 @@
-async function fetch_price_data() {
+async function fetch_price_data(item_id="2770", start=null, end=null) {
 
-    const item_id = "2770"
+    let url = `http://localhost:8000/data?item_id=${item_id}`
+    if (start && end) {
+        url += `&start=${start}&end=${end}`
+    }
 
-    const url = `http://localhost:8000/data?item_id=${item_id}`
+    console.log("Fetching:", url);
     const response = await fetch(url)
-    const data = await response.json();
+    const data = await response.json()
 
-    const dates = data.data.map(entry => new Date(entry.t));
-    const prices = data.data.map(entry => entry.price);
+    const dates = data.data.map(entry => new Date(entry.t))
+    const prices = data.data.map(entry => entry.price)
     
     console.log(dates)
 
@@ -20,10 +23,16 @@ function render_chart(dates, prices, item_name) {
     var trace1 = {
         x:dates,
         y:prices,
-        type: 'scatter'
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+            color: 'rgb(0, 123, 255)'
+        },
+        fill: 'tozeroy',
+        fillcolor: 'rgba(0, 123, 255, 0.1)'
     }
 
-    var trace = [trace1];
+    var trace = [trace1]
 
     var layout = {
         title: {
@@ -32,18 +41,58 @@ function render_chart(dates, prices, item_name) {
         showlegend: false
     }
 
-    Plotly.newPlot('priceChart', trace, layout, {scrollZoom: true});
+    Plotly.newPlot('priceChart', trace, layout, {scrollZoom: true})
 }
 
 async function get_item_name(item_id) {
 
     const url = `http://localhost:8000/name/${item_id}`
     const response = await fetch(url)
-    const name = await response.json();
+    const name = await response.json()
 
     return name
 }
 
+function get_timeframe(range) {
+    const now = new Date()
+    let start
+
+    switch (range) {
+        case "24h":
+            start = new Date(now.getTime() - (24 * 60 * 60 * 1000))
+            break
+        case "1W":
+            start = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000))
+            break
+        case "1M":
+            start = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000))
+            break
+        case "1Y":
+            start = new Date(now.getTime() - (365 * 24 * 60 * 60 * 1000))
+            break
+        case "All":
+            start = null
+            break
+        default:
+            start = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000))
+    }
+
+    if (start != null) {
+        start = start.toISOString()
+    }
+    end = now.toISOString()
+
+    return { start, end };
+}
+
+document.querySelectorAll(".timeframe-button").forEach(button => {
+    button.addEventListener("click", () => {
+        const range = button.dataset.range
+        const { start, end } = get_timeframe(range)
+        fetch_price_data("2770", start, end)
+    })
+})
+
 window.onload = function () {
-    fetch_price_data();
-};
+    fetch_price_data()
+}
