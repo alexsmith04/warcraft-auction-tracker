@@ -2,7 +2,8 @@ import json
 import statistics
 from collections import defaultdict
 from fetch import get_item_info_by_id
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from storage import get_prices_for_item
 
 def normalise_auction(auction):
 
@@ -102,3 +103,45 @@ def convert_timestamp_unix(ts_str: str) -> int:
     dt = datetime.fromisoformat(ts_str)
     dt = dt.replace(tzinfo=timezone.utc)
     return int(dt.timestamp() * 1000)
+
+def calculate_stats(price_data):
+    percentage_change = get_daily_change(price_data)
+
+    return percentage_change
+
+def get_daily_change(price_data):
+    now_ts = datetime.fromisoformat(price_data[-1][0])
+
+    target_ts = now_ts - timedelta(days=1)
+
+    closest_diff = None
+    closest_entry = None
+    highest_price = None
+    lowest_price = None
+
+    for entry in price_data:
+        ts = datetime.fromisoformat(entry[0])
+        price = entry[1]
+        difference = abs(target_ts - ts)
+
+        if closest_diff is None or difference < closest_diff:
+            closest_diff = difference
+            closest_entry = entry
+    
+    start_index = price_data.index(closest_entry)
+
+    for entry in price_data[start_index:]:
+        price = entry[1]
+        
+        if highest_price is None or price > highest_price:
+            highest_price = price
+
+        if lowest_price is None or price < lowest_price:
+            lowest_price = price
+    
+    now_price = price_data[-1][1]
+    previous_price = closest_entry[1]
+
+    percentage_change = (now_price - previous_price)/previous_price * 100
+
+    return percentage_change, highest_price, lowest_price

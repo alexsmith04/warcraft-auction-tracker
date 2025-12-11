@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from storage import get_prices_for_item
-from processor import convert_timestamp_unix
+from processor import convert_timestamp_unix, calculate_stats
 from typing import Optional
 from datetime import datetime, timezone
 from storage import get_item_name_from_db
@@ -43,7 +43,6 @@ async def ah_prices(
     end: Optional[str] = None
     ):
 
-    #item_id = 2770
     data = get_prices_for_item(item_id)
 
     results = []
@@ -67,3 +66,10 @@ async def ah_prices(
         "item_id": item_id,
         "data": results
     }
+
+@app.get("/stats/{item_id}")
+async def get_stats(item_id: int):
+    data = get_prices_for_item(item_id)
+    stats = calculate_stats(data)
+
+    return stats

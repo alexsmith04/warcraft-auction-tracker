@@ -5,14 +5,13 @@ async function fetch_price_data(item_id="2770", start=null, end=null) {
         url += `&start=${start}&end=${end}`
     }
 
-    console.log("Fetching:", url);
     const response = await fetch(url)
     const data = await response.json()
 
+    console.log(data)
+
     const dates = data.data.map(entry => new Date(entry.t))
     const prices = data.data.map(entry => entry.price)
-    
-    console.log(dates)
 
     const item_name = await get_item_name(item_id)
 
@@ -26,10 +25,15 @@ function render_chart(dates, prices, item_name) {
         type: 'scatter',
         mode: 'lines',
         line: {
-            color: 'rgb(0, 123, 255)'
+            color: 'rgb(0, 123, 255)',
+            shape: 'spline'
         },
         fill: 'tozeroy',
-        fillcolor: 'rgba(0, 123, 255, 0.1)'
+        fillcolor: 'rgba(0, 123, 255, 0.1)',
+        hovertemplate:
+            '<b>%{x|%b %d, %Y %H:%M}</b><br>' +
+            'Price: %{y:$,.0f}' +
+            '<extra></extra>'
     }
 
     var trace = [trace1]
@@ -38,7 +42,8 @@ function render_chart(dates, prices, item_name) {
         title: {
             text: `${item_name.name}`
         },
-        showlegend: false
+        showlegend: false,
+        hovermode: 'x',
     }
 
     Plotly.newPlot('priceChart', trace, layout, {scrollZoom: true})
@@ -51,6 +56,18 @@ async function get_item_name(item_id) {
     const name = await response.json()
 
     return name
+}
+
+async function get_stats(item_id) {
+
+    const url = `http://localhost:8000/stats/${item_id}`
+    const response = await fetch(url)
+    const data = await response.json()
+
+    console.log(data)
+
+    return data
+
 }
 
 function get_timeframe(range) {
@@ -99,4 +116,5 @@ buttons.forEach(function(button) {
 
 window.onload = function () {
     fetch_price_data()
+    get_stats(2770)
 }
