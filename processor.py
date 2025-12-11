@@ -1,5 +1,6 @@
 import json
 import statistics
+import numpy as np
 from collections import defaultdict
 from fetch import get_item_info_by_id
 from datetime import datetime, timezone, timedelta
@@ -106,8 +107,11 @@ def convert_timestamp_unix(ts_str: str) -> int:
 
 def calculate_stats(price_data):
     percentage_change = get_daily_change(price_data)
+    slope = get_trend(price_data)
+    volatility = get_volatility(price_data)
+    ath, atl = get_ath_atl(price_data)
 
-    return percentage_change
+    return percentage_change, slope, volatility, ath, atl
 
 def get_daily_change(price_data):
     now_ts = datetime.fromisoformat(price_data[-1][0])
@@ -145,3 +149,42 @@ def get_daily_change(price_data):
     percentage_change = (now_price - previous_price)/previous_price * 100
 
     return percentage_change, highest_price, lowest_price
+
+def get_trend(price_data):
+
+    if len(price_data) < 2:
+        return None
+    
+    ts = np.array([convert_timestamp_unix(entry[0]) for entry in price_data], dtype=np.float64)
+    prices = np.array([entry[1] for entry in price_data], dtype=np.float64)
+
+    ts_days = ts / (1000 * 60 * 60 * 24)
+
+    slope, intercept = np.polyfit(ts_days, prices, 1)
+
+    return slope
+
+def get_volatility(price_data):
+
+    if len(price_data) < 2:
+        return None
+    
+    prices = np.array([entry[1] for entry in price_data], dtype=np.float64)
+    returns = np.diff(np.log(prices))
+    vol = np.std(returns)
+
+    return vol
+
+def get_ath_atl(price_data):
+
+    ath = None
+    atl = None
+
+    for entry in price_data:
+        if ath is None or entry[1] > ath:
+            ath = entry[1]
+
+        if atl is None or entry[1] < atl:
+            atl = entry[1]
+
+    return ath, atl
