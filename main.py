@@ -23,7 +23,10 @@ def run_once():
 
     timestamp = datetime.utcnow().isoformat()
 
-    for item_id, median_price in medians.items():
+    for item_id, data in medians.items():
+
+        median_price = data["median"]
+        quantity = data["quantity"]
 
         name = get_item_name_from_db(item_id)
 
@@ -33,7 +36,8 @@ def run_once():
                 name = item_info["name"]
                 upsert_item_name(item_id, name)
 
-        insert_median_price(item_id, timestamp, median_price)
+        insert_median_price(item_id, timestamp, median_price, quantity)
+
 
     print("data inserted")
 

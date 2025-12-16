@@ -42,17 +42,17 @@ def upsert_item_name(item_id, name):
     conn.commit()
     conn.close()
 
-def insert_median_price(item_id, timestamp, median_price):
+def insert_median_price(item_id, timestamp, median_price, quantity):
 
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        INSERT INTO item_prices (item_id, timestamp, median_price)
-        VALUES (?, ?, ?)
+        INSERT INTO item_prices (item_id, timestamp, median_price, quantity)
+        VALUES (?, ?, ?, ?)
         """,
-        (item_id, timestamp, median_price)
+        (item_id, timestamp, median_price, quantity)
     )
 
     conn.commit()
