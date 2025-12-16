@@ -7,54 +7,60 @@ from datetime import datetime, timezone, timedelta
 from storage import get_prices_for_item
 
 def normalise_auction(auction):
-
-    buyout_price = auction.get('buyout')
+    buyout_price = auction.get("buyout")
+    quantity = auction.get("quantity", 1)
     
-    if not buyout_price:
+    if not buyout_price or quantity == 0:
         return None
 
-    else:
-        item_id = auction['item']['id']
-        quantity = auction['quantity']
-        unit_price = buyout_price/quantity
+    unit_price = buyout_price / quantity
 
-        auction = {'id': item_id, 'quantity': quantity, 'buyout_price': buyout_price, 'unit_price': unit_price}
-        return auction
+    return {
+        "id": auction["item"]["id"],
+        "unit_price": unit_price,
+        "quantity": quantity
+    }
+
     
 def normalise_auction_commodities(auction):
+    quantity = auction.get("quantity", 1)
+    unit_price = auction.get("unit_price")
 
-    buyout_price = auction.get('unit_price') * auction.get('quantity')
-    
-    if not buyout_price:
+    if unit_price is None or quantity == 0:
         return None
 
-    else:
-        item_id = auction['item']['id']
-        quantity = auction['quantity']
-        unit_price = buyout_price/quantity
+    buyout_price = unit_price * quantity
 
-        auction = {'id': item_id, 'quantity': quantity, 'buyout_price': buyout_price, 'unit_price': unit_price}
-        return auction
+    return {
+        "id": auction["item"]["id"],
+        "unit_price": unit_price,
+        "quantity": quantity,
+        "buyout_price": buyout_price
+    }
+
+
 
 def group_auctions_by_item_id(normalised_auctions):
-    
-    price_map = defaultdict(list)
+    price_map = defaultdict(lambda: {"prices": [], "quantity": 0})
 
     for auction in normalised_auctions:
-
-        if auction is not None:
-            price_map[auction['id']].append(auction['unit_price'])
+        if auction is None:
+            continue
+        item_id = auction["id"]
+        price_map[item_id]["prices"].append(auction["unit_price"])
+        price_map[item_id]["quantity"] += auction["quantity"]
 
     return price_map
 
+
 def calculate_median(price_map):
-    
     medians = {}
-
-    for item_id, prices in price_map.items():
-        median_price = statistics.median(prices)
-        medians[item_id] = median_price
-
+    for item_id, data in price_map.items():
+        median_price = statistics.median(data["prices"])
+        medians[item_id] = {
+            "median": median_price,
+            "quantity": data["quantity"]
+        }
     return medians
 
 def compute_item_medians(data):
@@ -188,3 +194,13 @@ def get_ath_atl(price_data):
             atl = entry[1]
 
     return ath, atl
+
+def get_volume(price_data):
+
+    volume = None
+    twenty_four_h_volume = None
+
+    for entry in price_data:
+         volume = entry[2]
+
+    return volume

@@ -64,7 +64,7 @@ def get_item_info_by_id(item_id):
     try:
         resp = requests.get(url, params=params, headers=headers)
         if resp.status_code == 404:
-            return None  # item does not exist in DB
+            return None
         resp.raise_for_status()
         return resp.json()
 

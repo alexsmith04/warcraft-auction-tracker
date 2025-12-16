@@ -33,26 +33,28 @@ def normalise_auction(auction):
         return auction
     
 def calculate_median(price_map):
-    
+
     medians = {}
 
-    for item_id, prices in price_map.items():
-        median_price = statistics.median(prices)
-        medians[item_id] = median_price
+    for item_id, data in price_map.items():
+        median_price = statistics.median(data["prices"])
+        medians[item_id] = {
+            "median": median_price,
+            "quantity": data["quantity"]
+        }
 
     return medians
 
 def group_auctions_by_item_id(normalised_auctions):
-    
-    price_map = defaultdict(list)
+
+    price_map = defaultdict(lambda: {"prices": [], "quantity": 0})
 
     for auction in normalised_auctions:
+        if auction is None:
+            continue
 
-        if auction is not None:
-            price_map[auction['id']].append(auction['unit_price'])
+        item_id = auction["id"]
+        price_map[item_id]["prices"].append(auction["unit_price"])
+        price_map[item_id]["quantity"] += auction["quantity"]
 
     return price_map
-
-medians = compute_commodities_medians(commodities)
-
-print(medians)
