@@ -112,12 +112,27 @@ def convert_timestamp_unix(ts_str: str) -> int:
     return int(dt.timestamp() * 1000)
 
 def calculate_stats(price_data):
-    percentage_change = get_daily_change(price_data)
-    slope = get_trend(price_data)
-    volatility = get_volatility(price_data)
-    ath, atl = get_ath_atl(price_data)
 
-    return percentage_change, slope, volatility, ath, atl
+    percentage_change, high, low = get_daily_change(price_data)
+    slope = get_trend(price_data)
+    volatility, stability_score = get_volatility_and_stability(price_data)
+    ath, atl = get_ath_atl(price_data)
+    total_volume, volume_24h = get_volume(price_data)
+
+    stats = {
+        "percentage_change": percentage_change,
+        "daily_high": high,
+        "daily_low": low,
+        "trend_slope": slope,
+        "volatility": volatility,
+        "stability_score": stability_score,
+        "all_time_high": ath,
+        "all_time_low": atl,
+        "total_volume": total_volume,
+        "volume_24h": volume_24h,
+    }
+
+    return stats
 
 def get_daily_change(price_data):
     now_ts = datetime.fromisoformat(price_data[-1][0])
@@ -157,9 +172,6 @@ def get_daily_change(price_data):
     return percentage_change, highest_price, lowest_price
 
 def get_trend(price_data):
-
-    if len(price_data) < 2:
-        return None
     
     ts = np.array([convert_timestamp_unix(entry[0]) for entry in price_data], dtype=np.float64)
     prices = np.array([entry[1] for entry in price_data], dtype=np.float64)
@@ -170,16 +182,19 @@ def get_trend(price_data):
 
     return slope
 
-def get_volatility(price_data):
-
-    if len(price_data) < 2:
-        return None
+def get_volatility_and_stability(price_data):
     
     prices = np.array([entry[1] for entry in price_data], dtype=np.float64)
     returns = np.diff(np.log(prices))
     vol = np.std(returns)
 
-    return vol
+    #reasonable estimate at a vol value that would be considered very unstable
+    MAX_VOL = 0.05
+    normalized_vol = vol/MAX_VOL
+    normalized_vol = min(max(normalized_vol, 0), 1)
+    stability_score = (1 - normalized_vol) * 100
+
+    return vol, stability_score
 
 def get_ath_atl(price_data):
 
@@ -196,11 +211,67 @@ def get_ath_atl(price_data):
     return ath, atl
 
 def get_volume(price_data):
-
-    volume = None
-    twenty_four_h_volume = None
+    '''
+    It should be noted that volume is not possible in the traditional sense.
+    This is a record of quantity loss over time, indicating that sales have occured (ie trades occured).
+    But this is a record between 2 snapshots of quantity of an item in time, and cannot find every trade that has occured.
+    If auctions are created and sold, this will not be known, as the API does not contain that data.
+    '''
+    parsed_data = []
 
     for entry in price_data:
-         volume = entry[2]
+         ts = entry[0]
+         ts = datetime.fromisoformat(ts)
+         quantity = entry[2]
+         parsed_data.append((ts, quantity))
 
-    return volume
+    now = parsed_data[-1][0]
+    target_ts = now - timedelta(days=1)
+
+    total_volume = 0
+    volume_24h = 0
+
+    previous_quantity = parsed_data[0][1]
+
+    for ts, quantity in parsed_data[1:]:
+        diff = previous_quantity - quantity
+
+        if diff > 0:
+            total_volume += diff
+
+            if ts >= target_ts:
+                volume_24h + diff
+
+        previous_quantity = quantity
+
+    return total_volume, volume_24h
+
+def get_moving_average(price_data):
+
+    filled_data = fill_missing_hours(price_data)
+    prices = [entry[1] for entry in filled_data]
+
+    window = 24
+    weights = np.ones(window)/window
+    ma = np.convolve(weights, prices, mode="valid")
+    ts_ma = [t for t, _ in filled_data][window-1:]
+
+    return (ts_ma, ma)
+
+def fill_missing_hours(price_data):
+    data = [(datetime.fromisoformat(entry[0]), entry[1]) for entry in price_data]
+    
+    filled = []
+    start_time = data[0][0]
+    end_time = data[-1][0]
+    idx = 0
+    last_price = data[0][1]
+
+    while start_time <= end_time:
+        if idx < len(data) and data[idx][0] == start_time:
+            last_price = data[idx][1]
+            idx += 1
+        filled.append((start_time, last_price))
+        start_time += timedelta(hours=1)
+    
+    return filled

@@ -65,7 +65,7 @@ def get_prices_for_item(item_id):
 
     cursor.execute(
         """
-        SELECT timestamp, median_price
+        SELECT timestamp, median_price, quantity
         FROM item_prices
         WHERE item_id = ?
         ORDER BY timestamp ASC

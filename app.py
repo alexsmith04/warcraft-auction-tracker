@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from storage import get_prices_for_item
-from processor import convert_timestamp_unix, calculate_stats
+from processor import convert_timestamp_unix, calculate_stats, get_moving_average
 from typing import Optional
 from datetime import datetime, timezone
 from storage import get_item_name_from_db
@@ -47,7 +47,7 @@ async def ah_prices(
 
     results = []
 
-    for timestamp, price in data:
+    for timestamp, price, _ in data:
         timestamp = convert_timestamp_unix(timestamp)
 
         if start:
@@ -62,9 +62,18 @@ async def ah_prices(
 
         results.append({"t": timestamp, "price": price})
 
+    ma_ts, ma = get_moving_average(data)
+
+    ma_results = []
+    ma_ts = [int(t.timestamp() * 1000) for t in ma_ts]
+    ma = ma.tolist()
+
+    ma_results.append({"ma_t": ma_ts, "ma_price": ma})
+
     return {
         "item_id": item_id,
-        "data": results
+        "data": results,
+        "ma_data": ma_results
     }
 
 @app.get("/stats/{item_id}")

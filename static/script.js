@@ -15,11 +15,14 @@ async function fetch_price_data(item_id="2770", start=null, end=null) {
 
     const item_name = await get_item_name(item_id)
 
-    render_chart(dates, prices, item_name)
+    const ma_ts = data.ma_data.map(entry => new Date(entry.ma_t))
+    const ma_prices = data.data.map(entry => entry.ma_prices)
+
+    render_chart(dates, prices, item_name, ma_ts, ma_prices)
 }
 
-function render_chart(dates, prices, item_name) {
-    var trace1 = {
+function render_chart(dates, prices, item_name, ma_ts, ma_prices) {
+    var price = {
         x:dates,
         y:prices,
         type: 'scatter',
@@ -36,7 +39,24 @@ function render_chart(dates, prices, item_name) {
             '<extra></extra>'
     }
 
-    var trace = [trace1]
+    var ma = {
+        x:ma_ts,
+        y:ma_prices,
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+            color: 'rgba(247, 58, 33, 1)',
+            shape: 'spline'
+        },
+        fill: 'tozeroy',
+        fillcolor: 'rgba(255, 85, 85, 0.1)',
+        hovertemplate:
+            '<b>%{x|%b %d, %Y %H:%M}</b><br>' +
+            'Price: %{y:$,.0f}' +
+            '<extra></extra>'
+    }
+
+    var trace = [price, ma]
 
     var layout = {
         title: {
