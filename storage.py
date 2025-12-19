@@ -92,4 +92,5 @@ def get_item_id_from_name(name):
     
     results = cursor.fetchall()
     conn.close()
+    results = results[0][0]
     return results

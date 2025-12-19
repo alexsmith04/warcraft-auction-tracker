@@ -1,0 +1,308 @@
+/* ===== Base ===== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #17171a;
+  color: #eaecef;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #0c1421;
+}
+
+/* ===== Header ===== */
+.header {
+  background: #0c1421;
+  border-bottom: 1px solid #3b424c;
+  padding: 10px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+.asset-header {
+  text-align: left;
+}
+
+.asset-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+  margin-bottom: 2px;
+}
+
+.asset-subtitle {
+  color: #848e9c;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ===== Search Bar ===== */
+.search-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px;
+  background: #1a2332;
+  border: 2px solid #3b424c;
+  border-radius: 12px;
+  color: #eaecef;
+  font-size: 16px;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #6b7280;
+}
+
+.search-input:focus {
+  border-color: #58a6ff;
+  background: #0c1421;
+  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+}
+
+.search-input:hover {
+  border-color: #4a5561;
+}
+
+/* ===== Main Layout ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  background: #0c1421;
+}
+
+/* ===== Panels ===== */
+.panel {
+  background: #0c1421;
+  padding: 24px 20px;
+  border-right: 1px solid #3b424c;
+}
+
+.left-panel {
+  border-left: none;
+}
+
+.right-panel {
+  border-right: none;
+}
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  color: #eaecef;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 12px;
+}
+
+/* ===== Price Ticker ===== */
+.price-ticker {
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #3b424c;
+}
+
+.ticker-asset-name {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+}
+
+.ticker-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.ticker-price-group {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.ticker-current-price-gsc {
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ticker-current-price {
+  color: #3b424c;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ticker-change-group {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.ticker-change {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.ticker-change.positive {
+  color: #0ecb81;
+}
+
+.ticker-change.negative {
+  color: #f6465d;
+}
+
+.ticker-timeframe {
+  color: #3b424c;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ===== Stats rows ===== */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid #3b424c;
+  font-size: 14px;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-row span {
+  color: #848e9c;
+  font-size: 13px;
+}
+
+.stat-row strong {
+  color: #eaecef;
+  font-weight: 500;
+}
+
+.panel-title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 12px;
+}
+
+/* ===== Chart ===== */
+.chart-panel {
+  background: #0c1421;
+  padding: 20px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #3b424c;
+  overflow: hidden;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #3b424c;
+  margin-bottom: 16px;
+}
+
+.chart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ===== Timeframe Buttons ===== */
+.timeframes {
+  display: flex;
+  gap: 4px;
+  background: #3b424c;
+  padding: 2px;
+  border-radius: 8px;
+}
+
+.timeframe-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.timeframe-button:hover {
+  background: #0c1421;
+  color: #eaecef;
+}
+
+.timeframe-button.active {
+  background: #0c1421;
+  color: #fff;
+}
+
+/* ===== Plotly ===== */
+#priceChart {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+}
+
+/* ===== About section ===== */
+.about-content {
+  color: #848e9c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel,
+  .right-panel {
+    display: none;
+  }
+  
+  .chart-panel {
+    border-right: none;
+  }
+
+  .search-container {
+    max-width: 90%;
+  }
+}

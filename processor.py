@@ -116,6 +116,7 @@ def calculate_stats(price_data):
     percentage_change, high, low = get_daily_change(price_data)
     slope = get_trend(price_data)
     volatility, stability_score = get_volatility_and_stability(price_data)
+    stability_label = get_stability_label(stability_score)
     ath, atl = get_ath_atl(price_data)
     total_volume, volume_24h = get_volume(price_data)
 
@@ -126,6 +127,7 @@ def calculate_stats(price_data):
         "trend_slope": slope,
         "volatility": volatility,
         "stability_score": stability_score,
+        "stability_label": stability_label,
         "all_time_high": ath,
         "all_time_low": atl,
         "total_volume": total_volume,
@@ -168,6 +170,7 @@ def get_daily_change(price_data):
     previous_price = closest_entry[1]
 
     percentage_change = (now_price - previous_price)/previous_price * 100
+    percentage_change = (f"{round(percentage_change, 2)}%")
 
     return percentage_change, highest_price, lowest_price
 
@@ -179,6 +182,7 @@ def get_trend(price_data):
     ts_days = ts / (1000 * 60 * 60 * 24)
 
     slope, intercept = np.polyfit(ts_days, prices, 1)
+    slope = round(slope, 2)
 
     return slope
 
@@ -191,10 +195,29 @@ def get_volatility_and_stability(price_data):
     #reasonable estimate at a vol value that would be considered very unstable
     MAX_VOL = 0.05
     normalized_vol = vol/MAX_VOL
-    normalized_vol = min(max(normalized_vol, 0), 1)
-    stability_score = (1 - normalized_vol) * 100
+    normalized_vol = round(min(max(normalized_vol, 0), 1), 3)
+    stability_score = round((1 - normalized_vol) * 100, 2)
 
-    return vol, stability_score
+    return normalized_vol, stability_score
+
+def get_stability_label(stability):
+    if stability is None or np.isinf(stability) or np.isnan(stability):
+        return {
+            "stability_label": "Insufficient data",
+            "color": "gray"
+        }
+
+    if stability > 40:
+        return "Very Stable"
+    elif stability > 20:
+        return "Stable"
+    elif stability > 10:
+        return "Moderate"
+    elif stability > 5:
+        return "Volatile"
+    else:
+        return "Very Volatile"
+
 
 def get_ath_atl(price_data):
 

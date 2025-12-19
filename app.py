@@ -4,9 +4,13 @@ from storage import get_prices_for_item
 from processor import convert_timestamp_unix, calculate_stats, get_moving_average
 from typing import Optional
 from datetime import datetime, timezone
-from storage import get_item_name_from_db
+from storage import get_item_name_from_db, get_item_id_from_name
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from pathlib import Path
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 origins = [
     "https://127.0.0.1/:5500",
@@ -26,15 +30,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.get("/", response_class=HTMLResponse)
+def serve_index():
+    return Path("static/index.html").read_text()
+
 
 @app.get("/name/{item_id}")
 async def get_item_name(item_id: int):
     name = get_item_name_from_db(item_id)
 
     return {"name": name}
+
+@app.get("/item_id/{item_name}")
+async def get_item_id(item_name: str):
+    item_id = get_item_id_from_name(item_name)
+
+    return item_id
 
 @app.get("/data")
 async def ah_prices(
