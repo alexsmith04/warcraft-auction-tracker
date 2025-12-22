@@ -119,6 +119,8 @@ def calculate_stats(price_data):
     stability_label = get_stability_label(stability_score)
     ath, atl = get_ath_atl(price_data)
     total_volume, volume_24h = get_volume(price_data)
+    percentage_changes = get_timeframe_percentage_change(price_data)
+    #percentage_changes = ['1']
 
     stats = {
         "percentage_change": percentage_change,
@@ -132,6 +134,7 @@ def calculate_stats(price_data):
         "all_time_low": atl,
         "total_volume": total_volume,
         "volume_24h": volume_24h,
+        "percentage_changes": percentage_changes,
     }
 
     return stats
@@ -298,3 +301,36 @@ def fill_missing_hours(price_data):
         start_time += timedelta(hours=1)
     
     return filled
+
+def get_timeframe_percentage_change(price_data):
+
+    now_ts = datetime.fromisoformat(price_data[-1][0])
+    first_ts = datetime.fromisoformat(price_data[0][0])
+    timeframes = {
+        "1w": now_ts - timedelta(weeks=1),
+        "1m": now_ts - timedelta(days=30),
+        "1y": now_ts - timedelta(weeks=52),
+        "all": first_ts
+    }
+    percentage_changes = {}
+    
+    for label, target_ts in timeframes.items():
+
+        closest_diff = None
+        closest_entry = None
+
+        for entry in price_data:
+            ts = datetime.fromisoformat(entry[0])
+            difference = abs(target_ts - ts)
+
+            if closest_diff is None or difference < closest_diff:
+                closest_diff = difference
+                closest_entry = entry
+        
+        now_price = price_data[-1][1]
+        previous_price = closest_entry[1]
+
+        percentage_change = (now_price - previous_price)/previous_price * 100
+        percentage_changes[label] = (f"{round(percentage_change, 2)}%")
+    
+    return percentage_changes

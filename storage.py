@@ -94,3 +94,30 @@ def get_item_id_from_name(name):
     conn.close()
     results = results[0][0]
     return results
+
+def get_market_overview():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            i.item_id,
+            i.name,
+            p.median_price,
+            p.quantity,
+            p.timestamp
+        FROM items i
+        JOIN item_prices p
+            ON p.item_id = i.item_id
+        WHERE p.timestamp = (
+            SELECT MAX(p2.timestamp)
+            FROM item_prices p2
+            WHERE p2.item_id = i.item_id
+        )
+        ORDER BY p.median_price DESC;
+        """)
+    
+    results = cursor.fetchall()
+    conn.close()
+    return results

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WoW Auction Tracker</title>
+
+  <!-- Plotly -->
+  <script src="https://cdn.plot.ly/plotly-3.3.0.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="asset-header">
+        <h1 id="itemTitle">Auction House Price</h1>
+        <div class="asset-subtitle">WoW Auction Data</div>
+      </div>
+      <div class="search-container">
+        <input type="text" placeholder="Search items..." class="search-input" id="itemSearch">
+      </div>
+    </header>
+
+    <!-- Main layout -->
+    <main class="layout">
+
+      <!-- Left panel -->
+      <aside class="panel left-panel">
+        <!-- Price Ticker -->
+        <div class="price-ticker">
+          <div class="ticker-asset-name" id="tickerAssetName">Item Name</div>
+          <div class="ticker-price-row">
+            <div class="ticker-price-group">
+              <div class="ticker-current-price-gsc" id="tickerCurrentPriceGSC"></div>
+              <div class="ticker-current-price" id="tickerCurrentPrice"></div>
+            </div>
+            <div class="ticker-change-group">
+              <div class="ticker-change" id="tickerChange"></div>
+              <span class="ticker-timeframe">(24h)</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="panel-title">Market Stats</h3>
+
+        <div class="stat-row">
+          <span>All Time High</span>
+          <strong id="all_time_high">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>All Time Low</span>
+          <strong id="all_time_low">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>24h High</span>
+          <strong id="daily_high">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>24h Low</span>
+          <strong id="daily_low">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>24h Percentage Change</span>
+          <strong id="percentage_change">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Stability</span>
+          <strong id="stability_score">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Stability</span>
+          <strong id="stability_label">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Total Volume</span>
+          <strong id="total_volume">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Trend</span>
+          <strong id="trend_slope">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>Volatility</span>
+          <strong id="volatility">—</strong>
+        </div>
+
+        <div class="stat-row">
+          <span>24h Volume</span>
+          <strong id="volume_24h">—</strong>
+        </div>
+      </aside>
+
+      <!-- Center chart -->
+      <section class="chart-panel">
+        <div class="chart-header">
+          <div class="chart-title">Price Chart</div>
+          <div class="timeframes">
+            <button class="timeframe-button active" data-range="24h">24h</button>
+            <button class="timeframe-button" data-range="1W">1W</button>
+            <button class="timeframe-button" data-range="1M">1M</button>
+            <button class="timeframe-button" data-range="1Y">1Y</button>
+            <button class="timeframe-button" data-range="All">All</button>
+          </div>
+        </div>
+
+        <div id="priceChart"></div>
+      </section>
+
+      <!-- Right panel -->
+      <aside class="panel right-panel">
+        <h3 class="panel-title">Performance</h3>
+
+        <div class="stat-row">
+          <span>(24h)</span>
+          <div class="ticker-change-group">
+            <strong class="ticker-change" id="change_24h">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <span>(1W)</span>
+          <div class="ticker-change-group">
+            <strong class="ticker-change" id="change_1w">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <span>(1M)</span>
+          <div class="ticker-change-group">
+            <strong class="ticker-change" id="change_1m">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <span>(1Y)</span>
+          <div class="ticker-change-group">
+            <strong class="ticker-change" id="change_1y">—</strong>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <span>(All)</span>
+          <div class="ticker-change-group">
+            <strong class="ticker-change" id="change_all">—</strong>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

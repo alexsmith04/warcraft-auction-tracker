@@ -27,7 +27,6 @@ async function fetch_price_data(item_id=currentItem, start=null, end=null) {
     document.getElementById("tickerChange").innerHTML = percentage_change_24h
     document.getElementById("change_24h").innerHTML = percentage_change_24h
 
-
     document.getElementById("tickerChange").style.color = percentage_change_24h >= 0 ? '#16c281' : '#e43943';
     document.getElementById("change_24h").style.color = percentage_change_24h >= 0 ? '#16c281' : '#e43943';
 
@@ -149,6 +148,8 @@ async function get_stats(item_id) {
     const response = await fetch(url)
     const data = await response.json()
 
+    console.log(data)
+
     var all_time_high = data.all_time_high
     var all_time_low = data.all_time_low
     var daily_high = data.daily_high
@@ -160,9 +161,11 @@ async function get_stats(item_id) {
     var trend_slope = data.trend_slope
     var volatility = data.volatility
     var volume_24h = data.volume_24h
-
-    console.log(stability_label)
-
+    var change_1w = data.percentage_changes["1w"]
+    var change_1m = data.percentage_changes["1m"]
+    var change_1y = data.percentage_changes["1y"]
+    var change_all = data.percentage_changes["all"]
+    
     document.getElementById("all_time_high").innerHTML = all_time_high
     document.getElementById("all_time_low").innerHTML = all_time_low
     document.getElementById("daily_high").innerHTML = daily_high
@@ -173,9 +176,16 @@ async function get_stats(item_id) {
     document.getElementById("total_volume").innerHTML = total_volume
     document.getElementById("trend_slope").innerHTML = trend_slope
     document.getElementById("volatility").innerHTML = volatility
-    document.getElementById("volume_24h").innerHTML = volume_24h
+    document.getElementById("change_1w").innerHTML = change_1w
+    document.getElementById("change_1m").innerHTML = change_1m
+    document.getElementById("change_1y").innerHTML = change_1y
+    document.getElementById("change_all").innerHTML = change_all
 
     document.getElementById("percentage_change").style.color = percentage_change >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("change_1w").style.color = change_1w >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("change_1m").style.color = change_1m >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("change_1y").style.color = change_1y >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("change_all").style.color = change_all >= 0 ? '#16c281' : '#e43943';
     document.getElementById("stability_score").style.color = getStabilityColor(stability_score)
     document.getElementById("stability_label").style.color = getStabilityColor(stability_score)
 

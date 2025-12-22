@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from storage import get_prices_for_item
+from storage import get_prices_for_item, get_market_overview
 from processor import convert_timestamp_unix, calculate_stats, get_moving_average
 from typing import Optional
 from datetime import datetime, timezone
@@ -30,9 +30,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/market", response_class=HTMLResponse)
+def serve_index():
+    
+    rows = get_market_overview()
+    results = []
+
+    for row in rows:
+
+        item = {
+            "item_id": row[0],
+            "name": row[1],
+            "median_price": row[2],
+            "quantity": row[3],
+            "timestamp": row[4],
+        }
+        results.append(item)
+
+    return results
+        
+
 @app.get("/", response_class=HTMLResponse)
 def serve_index():
-    return Path("static/index.html").read_text()
+    return Path("static/pricechart.html").read_text()
 
 
 @app.get("/name/{item_id}")
