@@ -30,28 +30,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/market", response_class=HTMLResponse)
-def serve_index():
-    
+@app.get("/", response_class=HTMLResponse)
+def serve_market():
+    return Path("static/market.html").read_text()
+
+@app.get("/market")
+def market_overview():
+
     rows = get_market_overview()
     results = []
 
     for row in rows:
-
         item = {
-            "item_id": row[0],
-            "name": row[1],
-            "median_price": row[2],
-            "quantity": row[3],
-            "timestamp": row[4],
+            "name": row[0],
+            "item_id": row[1],
         }
         results.append(item)
 
     return results
-        
 
-@app.get("/", response_class=HTMLResponse)
-def serve_index():
+@app.get("/pricechart", response_class=HTMLResponse)
+def serve_pricechart():
     return Path("static/pricechart.html").read_text()
 
 
@@ -68,11 +67,7 @@ async def get_item_id(item_name: str):
     return item_id
 
 @app.get("/data")
-async def ah_prices(
-    item_id: int,
-    start: Optional[str] = None,
-    end: Optional[str] = None
-    ):
+async def ah_prices(item_id: int, start: Optional[str] = None, end: Optional[str] = None):
 
     data = get_prices_for_item(item_id)
 

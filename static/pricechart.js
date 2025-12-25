@@ -1,4 +1,5 @@
-var currentItem = '2770'
+const urlParams = new URLSearchParams(window.location.search)
+const currentItem = urlParams.get('item_id') || null
 var timeframe = 'All'
 
 async function fetch_price_data(item_id=currentItem, start=null, end=null) {
@@ -27,8 +28,9 @@ async function fetch_price_data(item_id=currentItem, start=null, end=null) {
     document.getElementById("tickerChange").innerHTML = percentage_change_24h
     document.getElementById("change_24h").innerHTML = percentage_change_24h
 
-    document.getElementById("tickerChange").style.color = percentage_change_24h >= 0 ? '#16c281' : '#e43943';
-    document.getElementById("change_24h").style.color = percentage_change_24h >= 0 ? '#16c281' : '#e43943';
+    const change = parseFloat(percentage_change_24h);
+    document.getElementById("tickerChange").style.color = !isNaN(change) && change >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("change_24h").style.color = !isNaN(change) && change >= 0 ? '#16c281' : '#e43943';
 
     var ma_ts = null
     var ma_prices = null

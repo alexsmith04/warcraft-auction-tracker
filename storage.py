@@ -101,23 +101,11 @@ def get_market_overview():
 
     cursor.execute(
         """
-        SELECT
-            i.item_id,
-            i.name,
-            p.median_price,
-            p.quantity,
-            p.timestamp
-        FROM items i
-        JOIN item_prices p
-            ON p.item_id = i.item_id
-        WHERE p.timestamp = (
-            SELECT MAX(p2.timestamp)
-            FROM item_prices p2
-            WHERE p2.item_id = i.item_id
-        )
-        ORDER BY p.median_price DESC;
+        SELECT name, item_id
+        FROM items
+        ORDER BY item_id
         """)
-    
+
     results = cursor.fetchall()
     conn.close()
     return results

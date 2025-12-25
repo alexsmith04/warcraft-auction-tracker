@@ -82,6 +82,11 @@ body {
   border-color: #4a5561;
 }
 
+/* LOGO */
+.logo-container {
+  text-align: right;
+}
+
 /* ===== Main Layout ===== */
 .layout {
   display: grid;
