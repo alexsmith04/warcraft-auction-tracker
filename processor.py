@@ -173,7 +173,7 @@ def get_daily_change(price_data):
     previous_price = closest_entry[1]
 
     percentage_change = (now_price - previous_price)/previous_price * 100
-    percentage_change = (f"{round(percentage_change, 2)}%")
+    percentage_change = (f'{round(percentage_change, 2)}%')
 
     return percentage_change, highest_price, lowest_price
 

@@ -1,6 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search)
-const currentItem = urlParams.get('item_id') || null
-var timeframe = 'All'
+var currentItem = urlParams.get('item_id') || null
+var timeframe = "24h"
 
 async function fetch_price_data(item_id=currentItem, start=null, end=null) {
 
@@ -19,7 +19,7 @@ async function fetch_price_data(item_id=currentItem, start=null, end=null) {
     
     const item_name = await get_item_name(item_id)
     const recent_price = prices[prices.length - 1]
-    const percentage_change_24h = stats.percentage_change
+    var percentage_change_24h = stats.percentage_change
     const gsc_recent_price = copperToGSC(recent_price)
     
     document.getElementById("tickerAssetName").innerHTML = item_name.name
@@ -28,9 +28,8 @@ async function fetch_price_data(item_id=currentItem, start=null, end=null) {
     document.getElementById("tickerChange").innerHTML = percentage_change_24h
     document.getElementById("change_24h").innerHTML = percentage_change_24h
 
-    const change = parseFloat(percentage_change_24h);
-    document.getElementById("tickerChange").style.color = !isNaN(change) && change >= 0 ? '#16c281' : '#e43943';
-    document.getElementById("change_24h").style.color = !isNaN(change) && change >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("tickerChange").style.color = get_color(percentage_change_24h)
+    document.getElementById("change_24h").style.color = get_color(percentage_change_24h)
 
     var ma_ts = null
     var ma_prices = null
@@ -162,7 +161,6 @@ async function get_stats(item_id) {
     var total_volume = data.total_volume
     var trend_slope = data.trend_slope
     var volatility = data.volatility
-    var volume_24h = data.volume_24h
     var change_1w = data.percentage_changes["1w"]
     var change_1m = data.percentage_changes["1m"]
     var change_1y = data.percentage_changes["1y"]
@@ -183,11 +181,11 @@ async function get_stats(item_id) {
     document.getElementById("change_1y").innerHTML = change_1y
     document.getElementById("change_all").innerHTML = change_all
 
-    document.getElementById("percentage_change").style.color = percentage_change >= 0 ? '#16c281' : '#e43943';
-    document.getElementById("change_1w").style.color = change_1w >= 0 ? '#16c281' : '#e43943';
-    document.getElementById("change_1m").style.color = change_1m >= 0 ? '#16c281' : '#e43943';
-    document.getElementById("change_1y").style.color = change_1y >= 0 ? '#16c281' : '#e43943';
-    document.getElementById("change_all").style.color = change_all >= 0 ? '#16c281' : '#e43943';
+    document.getElementById("percentage_change").style.color = get_color(percentage_change)
+    document.getElementById("change_1w").style.color = get_color(change_1w)
+    document.getElementById("change_1m").style.color = get_color(change_1m)
+    document.getElementById("change_1y").style.color = get_color(change_1y)
+    document.getElementById("change_all").style.color = get_color(change_all)
     document.getElementById("stability_score").style.color = getStabilityColor(stability_score)
     document.getElementById("stability_label").style.color = getStabilityColor(stability_score)
 
@@ -277,6 +275,16 @@ function getStabilityColor(score) {
     if (score >= 10) return '#d39014ff'
     if (score >= 5)  return '#e43943'
     return '#991b1b'
+}
+
+function get_color(change){
+    change = parseInt(change.substring(0, change.length - 1))
+    var color = '#16c281'
+    if (change < 0) {
+        color = '#e43943'
+    }
+
+    return color
 }
 
 window.onload = function () {

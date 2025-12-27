@@ -150,14 +150,14 @@ body {
 
 .ticker-current-price-gsc {
   color: #fff;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   line-height: 1;
 }
 
 .ticker-current-price {
   color: #3b424c;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 600;
   line-height: 1;
 }
